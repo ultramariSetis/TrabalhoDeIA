@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from sklearn.metrics import silhouette_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -39,6 +40,11 @@ plt.xlabel('Número de Clusters (k)')
 plt.ylabel('SEQ')
 plt.show()
 
+#Comparar os graficos por genero
+df.set_index('CustomerID', inplace=True)
+sns.pairplot(df, hue='Genre', aspect=2)
+plt.show()
+
 # Descobrir o valor de K ideal
 #n_lista = [3,4,5,6]  #Comentado para usar apenas quando for printar os outros k valores
 n_lista = [5]
@@ -48,11 +54,26 @@ for n in n_lista:
         plt_cluster(n,cat)
 
 # Isso vai mostrar que k = 5 é o ideal para comparar idade x renda
+k=5
+i=2
+
+#Teste para ver diversos valores do Silhouette Score
+for i in range(2,11):
+    # 5. Aplicar K-Means com k=3
+    kmeans = KMeans(n_clusters=i, random_state=42) #Originalmente k=3
+    df['Cluster'] = kmeans.fit_predict(X_scaled)
 
 
-# 5. Aplicar K-Means com k=3
-kmeans = KMeans(n_clusters=3, random_state=42)
+    #Calcular o Silhouette Score
+    sil_score = silhouette_score(X_scaled, df['Cluster'])
+    print(f"Silhouette Score para k={i}: {sil_score}") # Originalmente k=k
+
+#Voltando ao valor original de K
+kmeans = KMeans(n_clusters=k, random_state=42) #Originalmente k=3
 df['Cluster'] = kmeans.fit_predict(X_scaled)
+sil_score = silhouette_score(X_scaled, df['Cluster'])
+print(f"Silhouette Score para k={k}: {sil_score}") # Originalmente k=k
+
 
 # 6. Visualização com PCA (redução para 2D)
 pca = PCA(n_components=2)
