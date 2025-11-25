@@ -34,17 +34,14 @@ df = pd.read_csv('Mall_Customers.csv')  # Substitua pelo caminho do arquivo
 # 2. Selecionar features relevantes
 X = df[features].copy()
 
-# 3. Pré-processamento: Normalização
-#scaler = StandardScaler()
-#X_scaled = scaler.fit_transform(X)
-
-# 4. Determinar k com Elbow Method (opcional, para validação)
+# 3. Determinar k com Elbow Method (opcional, para validação)
 inertia = []
 for k in range(1, 11):
-    kmeans = KMeans(n_clusters=k, n_init='auto', random_state=1)   #Random State 42 é uma referencia, pode ser qualquer valor
+    kmeans = KMeans(n_clusters=k, n_init='auto', random_state=42)   #Random State 42 é uma referencia, pode ser qualquer valor
     kmeans.fit(X)
     inertia.append(kmeans.inertia_)
 
+# 3.1. Plotar o Gráfico do Elbow
 fig, ax = plt.subplots(figsize=(12, 8))
 sns.lineplot(x=range(1, 11), y=inertia, ax=ax, marker='o')
 ax.set_title('Cluster SEQ')
@@ -53,12 +50,12 @@ ax.set_ylabel('SEQ')
 plt.show()
 
 
-#Comparar os graficos por genero
+#4. Comparar os Gráficos por Gênero
 df.set_index('CustomerID', inplace=True)
 sns.pairplot(df, hue='Genre', aspect=2)
 plt.show()
 
-# Descobrir o valor de K ideal
+#5. Descobrir o valor de K ideal
 #n_lista = [3,4,5,6]  #Comentado para usar apenas quando for printar os outros k valores
 n_lista = [5]
 for n in n_lista:
@@ -66,45 +63,30 @@ for n in n_lista:
         plt_cluster(n,cat)
 
 # Isso vai mostrar que k = 5 é o ideal para comparar idade x renda
-k=5
-i=2
+k=5  #definimos k=5
+i=2  
 
-#Teste para ver diversos valores do Silhouette Score
+#6. Teste para ver diversos valores do Silhouette Score
 for i in range(2,11):
-    # 5. Aplicar K-Means com k=3
+    #7. Aplicar K-Means com k=3
     kmeans = KMeans(n_clusters=i, random_state=42) #Originalmente k=3
     df['Cluster'] = kmeans.fit_predict(X)
 
-
-    #Calcular o Silhouette Score
+    #8. Calcular o Silhouette Score
     sil_score = silhouette_score(X, df['Cluster'])
     print(f"Silhouette Score para k={i}: {sil_score}") # Originalmente k=k
 
-#Voltando ao valor original de K
+#9. Voltando ao valor original de K
 kmeans = KMeans(n_clusters=k, random_state=42) #Originalmente k=3
 df['Cluster'] = kmeans.fit_predict(X)
 sil_score = silhouette_score(X, df['Cluster'])
 print(f"Silhouette Score para k={k}: {sil_score}") # Originalmente k=k
 
-
-# 6. Visualização com PCA (redução para 2D)
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X) #Tem como melhorar o posicionamento dos centroides no PCA
-df['PCA1'] = X_pca[:, 0]
-df['PCA2'] = X_pca[:, 1]
-
-plt.figure(figsize=(8, 6))
-sns.scatterplot(data=df, x='PCA1', y='PCA2', hue='Cluster', palette='viridis', s=100)
-plt.title('Clusters de Clientes (PCA)')
-plt.legend(title='Cluster')
-plt.show()
-
-# 7. Análise dos clusters
+# 10. Análise dos clusters
 cluster_summary = df.groupby('Cluster')[features].mean()
 print(cluster_summary)
-#print(f"SEQ = {kmeans.inertia_}")
-#print(f"SEQ = {inertia}")
 
+#11. Analise dos valores de SEQ
 j=1
 for j in range(10):
     print(f"SEQ ({j+1}) = {inertia[j]}")
