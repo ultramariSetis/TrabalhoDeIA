@@ -68,25 +68,24 @@ i=2
 
 #6. Teste para ver diversos valores do Silhouette Score
 for i in range(2,11):
-    #7. Aplicar K-Means com k=3
-    kmeans = KMeans(n_clusters=i, random_state=42) #Originalmente k=3
-    df['Cluster'] = kmeans.fit_predict(X)
+    #7. Aplicar K-Means para k de 1 a k
+    kmeans = KMeans(n_clusters=i, random_state=42)
+    #df['Cluster'] = kmeans.fit_predict(X)
+    labelx = kmeans.fit_predict(X)
 
     #8. Calcular o Silhouette Score
-    sil_score = silhouette_score(X, df['Cluster'])
-    print(f"Silhouette Score para k={i}: {sil_score}") # Originalmente k=k
+    sil_score = silhouette_score(X, labelx)
+    print(f"Silhouette Score para k={i}: {sil_score}")
 
-#9. Voltando ao valor original de K
-kmeans = KMeans(n_clusters=k, random_state=42) #Originalmente k=3
+#9. Cálculo dos Clusters
+kmeans = KMeans(n_clusters=5, random_state=42)
 df['Cluster'] = kmeans.fit_predict(X)
-sil_score = silhouette_score(X, df['Cluster'])
-print(f"Silhouette Score para k={k}: {sil_score}") # Originalmente k=k
 
-# 10. Análise dos clusters
+# 9.1. Análise dos clusters
 cluster_summary = df.groupby('Cluster')[features].mean()
 print(cluster_summary)
 
-#11. Analise dos valores de SEQ
+#10. Analise dos valores de SEQ de 1 até 10
 j=1
 for j in range(10):
     print(f"SEQ ({j+1}) = {inertia[j]}")
